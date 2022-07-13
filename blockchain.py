@@ -19,6 +19,7 @@ class Blockchain:
     # Create the first block and set hash to "0"
     def __init__(self):
         self.chain = []
+    # Add the first block with set data and a random Payload
         first_block = {
             'index': len(self.chain) + 1,
             'timestamp': str(datetime.datetime.now()),
@@ -27,9 +28,9 @@ class Blockchain:
             'payload': str(randbelow(10))
         }
         self.chain.append(first_block)
-        #self.create_block(proof=1, previous_hash='0')
     
     # Add blocks to the chain
+    # Blocks can either have arandom payload or a set payload
     def create_block(self, proof, previous_hash, payload=-1):
         if payload < 0:
             payload=randbelow(10)
@@ -93,6 +94,15 @@ app = Flask(__name__)
 # create instance of blockchain
 blockchain = Blockchain()
 
+# Home Page shows instructions
+@app.route('/')
+def home():
+    return """<xmp>Append any of the following to the url:
+    - /get_chain                          => print the entire blockchain
+    - /mine_block                         => add a block with a random payload to the chain
+    - /custom_block/<Your Payload Here>   => add a block with a custom payload of digits
+    - /valid                              => checks if the blockchain is valid' </xmp>"""
+
 # Mine a new block
 @app.route('/mine_block', methods=['GET'])
 def mine_block():
@@ -113,6 +123,7 @@ def mine_block():
 
     return jsonify(response), 200
 
+#Mine a new block with a custom payload
 @app.route('/custom_block/<int:num>', methods=['GET'])
 def custom_block(num:int):
     previous_block = blockchain.get_previous_block()
